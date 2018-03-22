@@ -19,7 +19,14 @@ The output of `ProcessStruct(SomeStruct{})` will be a slice of strings like this
 
 ## Install
 
-TBD
+	go get github.com/amattn/struct2webform
+
+or if you want to update to latest:
+
+	go get -u github.com/amattn/struct2webform
+
+
+`struct2webform` is currently considered alpha software.  We recommend vendoring for now.
 
 ## Usage
 
