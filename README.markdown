@@ -36,6 +36,7 @@ Currently supported types:
 - int64
 - float64
 - bool
+- time.Time
 
 TBD
 
