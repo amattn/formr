@@ -37,6 +37,7 @@ Currently supported types:
 - float64
 - bool
 - time.Time
+- pointers to any of the above types
 
 TBD
 

@@ -26,6 +26,7 @@ func ProcessStruct(some_struct interface{}) ([]FormElement, error) {
 	all_errors := []error{}
 
 	thing_type := reflect.TypeOf(some_struct)
+	thing_value := reflect.ValueOf(some_struct)
 	thing_kind := thing_type.Kind()
 
 	if thing_kind != reflect.Struct {
@@ -38,7 +39,7 @@ func ProcessStruct(some_struct interface{}) ([]FormElement, error) {
 		struct_field := thing_type.Field(i)
 		form_field_name := struct_field.Tag.Get(STRUCT_TAG_KEY_FIELD_NAME)
 		if form_field_name != "" {
-			form_element, err := process_field(some_struct, i)
+			form_element, err := process_field(struct_field, thing_value.Field(i))
 			if err != nil {
 				all_errors = append(all_errors, err)
 			} else if form_element != nil {
@@ -61,44 +62,34 @@ func ProcessStruct(some_struct interface{}) ([]FormElement, error) {
 	return form_elements, nil
 }
 
-func process_field(some_struct interface{}, field_num int) (*FormElement, error) {
+func process_field(struct_field reflect.StructField, struct_field_value reflect.Value) (*FormElement, error) {
 	var form_element FormElement
 	var err error
 
-	thing_type := reflect.TypeOf(some_struct)
-	thing_value := reflect.ValueOf(some_struct)
+	// log.Println(2531510246, struct_field)
+	// log.Println(2531510247, struct_field_value)
 
-	i := field_num
-	struct_field := thing_type.Field(i)
-	// log.Println(3073721749, struct_field)
-
-	switch field_kind := struct_field.Type.Kind(); {
+	switch field_kind := struct_field_value.Kind(); {
 	case field_kind == reflect.String:
-		current_value := thing_value.Field(i)
-		unwrapped_value := current_value.String()
+		unwrapped_value := struct_field_value.String()
 		form_element, err = form_output_input_type_text(struct_field, unwrapped_value)
 
 	case field_kind == reflect.Int64:
-		current_value := thing_value.Field(i)
-		unwrapped_value := current_value.Int()
+		unwrapped_value := struct_field_value.Int()
 		string_value := strconv.FormatInt(unwrapped_value, 10)
 		form_element, err = form_output_input_type_text(struct_field, string_value)
 
 	case field_kind == reflect.Float64:
-		current_value := thing_value.Field(i)
-		unwrapped_value := current_value.Float()
+		unwrapped_value := struct_field_value.Float()
 		string_value := fmt.Sprintf("%g", unwrapped_value)
 		form_element, err = form_output_input_type_text(struct_field, string_value)
 
 	case field_kind == reflect.Bool:
-		current_value := thing_value.Field(i)
-		unwrapped_value := current_value.Bool()
+		unwrapped_value := struct_field_value.Bool()
 		form_element, err = form_output_bool(struct_field, unwrapped_value)
 
 	case field_kind == reflect.Struct:
-
-		current_value := thing_value.Field(i)
-		unknown_interface := current_value.Interface()
+		unknown_interface := struct_field_value.Interface()
 		unwrapped_value, is_expected_type := unknown_interface.(time.Time)
 		if is_expected_type {
 			marshalled_bytes, _ := unwrapped_value.MarshalText()
@@ -106,6 +97,14 @@ func process_field(some_struct interface{}, field_num int) (*FormElement, error)
 			form_element, err = form_output_input_type_text(struct_field, string_value)
 		}
 
+	case field_kind == reflect.Ptr:
+		if struct_field_value.IsNil() {
+
+			dereferenced_type := struct_field_value.Type().Elem()
+			return process_field(struct_field, reflect.Zero(dereferenced_type))
+		} else {
+			return process_field(struct_field, struct_field_value.Elem())
+		}
 	default:
 
 	}

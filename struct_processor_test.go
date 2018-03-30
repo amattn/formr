@@ -131,8 +131,10 @@ func TestComplexStruct(t *testing.T) {
 
 	some_type := reflect.TypeOf(is_a_struct)
 
-	if len(form_strings) != some_type.NumField() {
-		t.Errorf("Expected %d form elements of output, but got: %d", some_type.NumField(), len(form_strings))
+	expected_num := some_type.NumField() - 2
+
+	if len(form_strings) != expected_num {
+		t.Errorf("Expected %d form elements of output, but got: %d", expected_num, len(form_strings))
 		t.Log("Output Lines:")
 		for i, form_element := range form_strings {
 			t.Logf("%d %s", i, form_element)
