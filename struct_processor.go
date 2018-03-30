@@ -16,8 +16,8 @@ func init() {
 }
 
 type FormElement struct {
-	Label   string
-	Element string
+	Label   template.HTML
+	Element template.HTML
 }
 
 // Not a stable interface yet.  I expect this function signature to change eventually.
@@ -124,7 +124,7 @@ const (
 	STRUCT_TAG_KEY_LABEL_CONTENTS    = "s2w_label"
 	STRUCT_TAG_KEY_CURRENT_VALUE     = "s2w_value"
 
-	EMPTY_VALUE_PLACEHOLDER = "PLACEHOLDER"
+	EMPTY_VALUE_MARK = "-"
 
 	DEFAULT_LABEL_TEMPLATE = `<label{{ if .s2w_id }} for="{{ .s2w_id }}"{{ end }}>{{ .s2w_label }}</label>`
 )
@@ -136,7 +136,7 @@ func form_output_input_type_text(struct_field reflect.StructField, current_value
 	label_contents := struct_field.Tag.Get(STRUCT_TAG_KEY_LABEL_CONTENTS)
 
 	if form_field_name == "" {
-		form_field_name = EMPTY_VALUE_PLACEHOLDER
+		form_field_name = struct_field.Name
 	}
 
 	data := map[string]interface{}{
@@ -157,6 +157,10 @@ func form_output_bool(struct_field reflect.StructField, current_value bool) (For
 	form_field_id := struct_field.Tag.Get(STRUCT_TAG_KEY_FIELD_ID)
 	form_field_name := struct_field.Tag.Get(STRUCT_TAG_KEY_FIELD_NAME)
 	label_contents := struct_field.Tag.Get(STRUCT_TAG_KEY_LABEL_CONTENTS)
+
+	if form_field_name == "" {
+		form_field_name = struct_field.Name
+	}
 
 	is_checked := ""
 	if current_value {
@@ -187,7 +191,7 @@ func execute_templates(debug_num int64, label_template, element_template string,
 		return FormElement{}, err
 	}
 
-	return FormElement{Label: label_string, Element: element_string}, nil
+	return FormElement{Label: template.HTML(label_string), Element: template.HTML(element_string)}, nil
 }
 
 func execute_single_template(debug_num int64, raw_template string, data interface{}) (string, error) {

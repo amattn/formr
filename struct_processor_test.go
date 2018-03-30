@@ -1,6 +1,7 @@
 package struct2webform
 
 import (
+	"html/template"
 	"reflect"
 	"testing"
 	"time"
@@ -58,8 +59,8 @@ func TestAllSupportedTypes(t *testing.T) {
 		t.Errorf("2044655071 Expected %d form elements of output, but got: %d", expected_num, len(form_elements))
 	}
 
-	label_expecteds := make([]string, 0, expected_num)
-	element_expecteds := make([]string, 0, expected_num)
+	label_expecteds := make([]template.HTML, 0, expected_num)
+	element_expecteds := make([]template.HTML, 0, expected_num)
 
 	label_expecteds = append(label_expecteds, `<label for="string_id">AString:</label>`)
 	label_expecteds = append(label_expecteds, `<label for="int64_id">AInt64:</label>`)
@@ -168,8 +169,8 @@ func TestCheckbox(t *testing.T) {
 		}
 	}
 
-	label_expecteds := make([]string, 3)
-	element_expecteds := make([]string, 3)
+	label_expecteds := make([]template.HTML, 3)
+	element_expecteds := make([]template.HTML, 3)
 
 	label_expecteds[0] = `<label></label>`
 	label_expecteds[1] = `<label></label>`
