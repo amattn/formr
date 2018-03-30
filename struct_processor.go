@@ -37,15 +37,11 @@ func ProcessStruct(some_struct interface{}) ([]FormElement, error) {
 	for i := 0; i < thing_type.NumField(); i++ {
 
 		struct_field := thing_type.Field(i)
-		form_field_name := struct_field.Tag.Get(STRUCT_TAG_KEY_FIELD_NAME)
-		if form_field_name != "" {
-			form_element, err := process_field(struct_field, thing_value.Field(i))
-			if err != nil {
-				all_errors = append(all_errors, err)
-			} else if form_element != nil {
-				form_elements = append(form_elements, *form_element)
-			}
-
+		form_element, err := process_field(struct_field, thing_value.Field(i))
+		if err != nil {
+			all_errors = append(all_errors, err)
+		} else if form_element != nil {
+			form_elements = append(form_elements, *form_element)
 		}
 	}
 
@@ -63,7 +59,7 @@ func ProcessStruct(some_struct interface{}) ([]FormElement, error) {
 }
 
 func process_field(struct_field reflect.StructField, struct_field_value reflect.Value) (*FormElement, error) {
-	var form_element FormElement
+	var form_element *FormElement
 	var err error
 
 	// log.Println(2531510246, struct_field)
@@ -112,7 +108,7 @@ func process_field(struct_field reflect.StructField, struct_field_value reflect.
 	if err != nil {
 		return nil, err
 	} else {
-		return &form_element, err
+		return form_element, err
 	}
 
 }
@@ -124,42 +120,67 @@ const (
 	STRUCT_TAG_KEY_LABEL_CONTENTS    = "s2w_label"
 	STRUCT_TAG_KEY_CURRENT_VALUE     = "s2w_value"
 
+	STRUCT_TAG_KEY_GORILLA_SCHEMA_KEY_NAME = "schema"
+
 	EMPTY_VALUE_MARK = "-"
 
 	DEFAULT_LABEL_TEMPLATE = `<label{{ if .s2w_id }} for="{{ .s2w_id }}"{{ end }}>{{ .s2w_label }}</label>`
 )
 
-func form_output_input_type_text(struct_field reflect.StructField, current_value string) (FormElement, error) {
-
+func process_tag(struct_field reflect.StructField) (map[string]interface{}, bool) {
 	form_field_id := struct_field.Tag.Get(STRUCT_TAG_KEY_FIELD_ID)
-	form_field_name := struct_field.Tag.Get(STRUCT_TAG_KEY_FIELD_NAME)
 	label_contents := struct_field.Tag.Get(STRUCT_TAG_KEY_LABEL_CONTENTS)
 
+	// first check for s2w_name
+	form_field_name := struct_field.Tag.Get(STRUCT_TAG_KEY_FIELD_NAME)
 	if form_field_name == "" {
-		form_field_name = struct_field.Name
+
+		// then check for "schema"
+		gorilla_schema_tag_name := struct_field.Tag.Get(STRUCT_TAG_KEY_GORILLA_SCHEMA_KEY_NAME)
+
+		if gorilla_schema_tag_name != "" {
+			form_field_name = gorilla_schema_tag_name
+		} else {
+			// if no tag, use field name
+			form_field_name = struct_field.Name
+		}
 	}
+
+	if form_field_name == "-" {
+		// Bail out
+		return nil, false
+	}
+
+	// log.Println(3013947950, form_field_name)
 
 	data := map[string]interface{}{
 		STRUCT_TAG_KEY_STRUCT_FIELD_TYPE: struct_field.Type.String(),
 		STRUCT_TAG_KEY_FIELD_ID:          form_field_id,
 		STRUCT_TAG_KEY_FIELD_NAME:        form_field_name,
 		STRUCT_TAG_KEY_LABEL_CONTENTS:    label_contents,
-		STRUCT_TAG_KEY_CURRENT_VALUE:     current_value,
 	}
+	return data, true
+}
+
+func form_output_input_type_text(struct_field reflect.StructField, current_value string) (*FormElement, error) {
+
+	data, is_ok := process_tag(struct_field)
+	if is_ok == false {
+		return nil, nil
+	}
+
+	data[STRUCT_TAG_KEY_CURRENT_VALUE] = current_value
 
 	element_template := `<input type="text"{{ if .s2w_id }} id="{{ .s2w_id }}"{{ end }} class="s2w_{{ .s2w_type }}" name="{{ .s2w_name }}" value="{{ .s2w_value }}">`
 
 	return execute_templates(1522519197, DEFAULT_LABEL_TEMPLATE, element_template, data)
 }
 
-func form_output_bool(struct_field reflect.StructField, current_value bool) (FormElement, error) {
+func form_output_bool(struct_field reflect.StructField, current_value bool) (*FormElement, error) {
 
-	form_field_id := struct_field.Tag.Get(STRUCT_TAG_KEY_FIELD_ID)
-	form_field_name := struct_field.Tag.Get(STRUCT_TAG_KEY_FIELD_NAME)
-	label_contents := struct_field.Tag.Get(STRUCT_TAG_KEY_LABEL_CONTENTS)
-
-	if form_field_name == "" {
-		form_field_name = struct_field.Name
+	data, is_ok := process_tag(struct_field)
+	if is_ok == false {
+		return nil, nil
 	}
 
 	is_checked := ""
@@ -167,31 +188,28 @@ func form_output_bool(struct_field reflect.StructField, current_value bool) (For
 		is_checked = "checked"
 	}
 
-	data := map[string]interface{}{
-		STRUCT_TAG_KEY_STRUCT_FIELD_TYPE: struct_field.Type.String(),
-		STRUCT_TAG_KEY_FIELD_ID:          form_field_id,
-		STRUCT_TAG_KEY_FIELD_NAME:        form_field_name,
-		STRUCT_TAG_KEY_LABEL_CONTENTS:    label_contents,
-		STRUCT_TAG_KEY_CURRENT_VALUE:     is_checked,
-	}
+	data[STRUCT_TAG_KEY_CURRENT_VALUE] = is_checked
 
 	element_template := `<input type="checkbox"{{ if .s2w_id }} id="{{ .s2w_id }}"{{ end }} class="s2w_{{ .s2w_type }}" name="{{ .s2w_name }}"{{if .s2w_value }} {{ .s2w_value }}{{end}}>`
 
-	return execute_templates(1963919951, DEFAULT_LABEL_TEMPLATE, element_template, data)
+	element, err := execute_templates(1963919951, DEFAULT_LABEL_TEMPLATE, element_template, data)
+	return element, err
 }
 
-func execute_templates(debug_num int64, label_template, element_template string, data interface{}) (FormElement, error) {
+func execute_templates(debug_num int64, label_template, element_template string, data interface{}) (*FormElement, error) {
 	label_string, err := execute_single_template(debug_num, label_template, data)
 	if err != nil {
-		return FormElement{}, err
+		return nil, err
 	}
 
 	element_string, err := execute_single_template(debug_num, element_template, data)
 	if err != nil {
-		return FormElement{}, err
+		return nil, err
 	}
 
-	return FormElement{Label: template.HTML(label_string), Element: template.HTML(element_string)}, nil
+	element := FormElement{Label: template.HTML(label_string), Element: template.HTML(element_string)}
+
+	return &element, nil
 }
 
 func execute_single_template(debug_num int64, raw_template string, data interface{}) (string, error) {

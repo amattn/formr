@@ -13,11 +13,11 @@ import (
 )
 
 type ExampleStruct struct {
-	AString string `s2w_id:"string_id" s2w_name:"string_name" s2w_label:"AString:" schema:"string_name"`
-	AInt64  int64  `s2w_id:"int64_id" s2w_name:"int64_name" s2w_label:"AInt64:" schema:"int64_name"`
-	ABool   bool   `s2w_id:"bool_id" s2w_name:"bool_name" s2w_label:"ABool:" schema:"bool_name"`
+	AString string `s2w_id:"string_id" s2w_label:"AString:" schema:"string_name"`
+	AInt64  int64  `s2w_id:"int64_id" s2w_label:"AInt64:" schema:"int64_name"`
+	ABool   bool   `s2w_id:"bool_id" s2w_label:"ABool:" schema:"bool_name"`
 
-	ATime time.Time `s2w_id:"time_id" s2w_name:"time_name" s2w_label:"ATime:" schema:"time_name"`
+	ATime time.Time `s2w_id:"time_id" s2w_label:"ATime:" schema:"time_name"`
 }
 
 const index_template = `<!DOCTYPE html>
@@ -111,7 +111,7 @@ func main() {
 
 	})
 
-	host_and_port := ":8080"
+	host_and_port := ":8273"
 	log.Println("Starting HTTP server at", "\nhttp://"+host_and_port)
 	log.Fatal(http.ListenAndServe(host_and_port, nil))
 
