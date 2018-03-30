@@ -8,16 +8,16 @@ import (
 	"net/http"
 	"time"
 
-	formr "../../struct2webform"
+	formr "../../formr"
 	gschema "github.com/gorilla/schema"
 )
 
 type ExampleStruct struct {
-	AString string `s2w_id:"string_id" s2w_label:"AString:" schema:"string_name"`
-	AInt64  int64  `s2w_id:"int64_id" s2w_label:"AInt64:" schema:"int64_name"`
-	ABool   bool   `s2w_id:"bool_id" s2w_label:"ABool:" schema:"bool_name"`
+	AString string `formr_id:"string_id" formr_label:"AString:" schema:"string_name"`
+	AInt64  int64  `formr_id:"int64_id" formr_label:"AInt64:" schema:"int64_name"`
+	ABool   bool   `formr_id:"bool_id" formr_label:"ABool:" schema:"bool_name"`
 
-	ATime time.Time `s2w_id:"time_id" s2w_label:"ATime:" schema:"time_name"`
+	ATime time.Time `formr_id:"time_id" formr_label:"ATime:" schema:"time_name"`
 }
 
 const index_template = `<!DOCTYPE html>

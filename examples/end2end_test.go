@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	formr "../../struct2webform"
+	"../../formr"
 )
 
 func TestTemplate(t *testing.T) {

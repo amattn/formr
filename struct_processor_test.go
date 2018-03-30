@@ -1,4 +1,4 @@
-package struct2webform
+package formr
 
 import (
 	"html/template"
@@ -33,18 +33,18 @@ func TestStruct(t *testing.T) {
 }
 
 type AllSupportedTypes struct {
-	AString  string  `s2w_id:"string_id" s2w_name:"string_name" s2w_label:"AString:"`
-	AInt64   int64   `s2w_id:"int64_id" s2w_name:"int64_name" s2w_label:"AInt64:"`
-	AFloat64 float64 `s2w_id:"float64_id" s2w_name:"float64_name" s2w_label:"AFloat64:"`
-	ABool    bool    `s2w_id:"bool_id" s2w_name:"bool_name" s2w_label:"ABool:"`
+	AString  string  `formr_id:"string_id" formr:"string_name" formr_label:"AString:"`
+	AInt64   int64   `formr_id:"int64_id" formr:"int64_name" formr_label:"AInt64:"`
+	AFloat64 float64 `formr_id:"float64_id" formr:"float64_name" formr_label:"AFloat64:"`
+	ABool    bool    `formr_id:"bool_id" formr:"bool_name" formr_label:"ABool:"`
 
-	ATime     time.Time `s2w_id:"time_id" s2w_name:"time_name" s2w_label:"ATime:"`
-	ADate     time.Time `s2w_id:"date_id" s2w_name:"date_name" s2w_label:"ADate:"`
-	ADateTime time.Time `s2w_id:"datetime_id" s2w_name:"datetime_name" s2w_label:"ADateTime:"`
+	ATime     time.Time `formr_id:"time_id" formr:"time_name" formr_label:"ATime:"`
+	ADate     time.Time `formr_id:"date_id" formr:"date_name" formr_label:"ADate:"`
+	ADateTime time.Time `formr_id:"datetime_id" formr:"datetime_name" formr_label:"ADateTime:"`
 
 	NoTagField string
 
-	IgnoreThis bool `s2w_name:"-"`
+	IgnoreThis bool `formr:"-"`
 }
 
 func TestAllSupportedTypes(t *testing.T) {
@@ -73,14 +73,14 @@ func TestAllSupportedTypes(t *testing.T) {
 	label_expecteds = append(label_expecteds, `<label for="datetime_id">ADateTime:</label>`)
 	label_expecteds = append(label_expecteds, `<label></label>`)
 
-	element_expecteds = append(element_expecteds, `<input type="text" id="string_id" class="s2w_string" name="string_name" value="">`)
-	element_expecteds = append(element_expecteds, `<input type="text" id="int64_id" class="s2w_int64" name="int64_name" value="0">`)
-	element_expecteds = append(element_expecteds, `<input type="text" id="float64_id" class="s2w_float64" name="float64_name" value="0">`)
-	element_expecteds = append(element_expecteds, `<input type="checkbox" id="bool_id" class="s2w_bool" name="bool_name">`)
-	element_expecteds = append(element_expecteds, `<input type="text" id="time_id" class="s2w_time.Time" name="time_name" value="0001-01-01T00:00:00Z">`)
-	element_expecteds = append(element_expecteds, `<input type="text" id="date_id" class="s2w_time.Time" name="date_name" value="0001-01-01T00:00:00Z">`)
-	element_expecteds = append(element_expecteds, `<input type="text" id="datetime_id" class="s2w_time.Time" name="datetime_name" value="0001-01-01T00:00:00Z">`)
-	element_expecteds = append(element_expecteds, `<input type="text" class="s2w_string" name="NoTagField" value="">`)
+	element_expecteds = append(element_expecteds, `<input type="text" id="string_id" class="formr_string" name="string_name" value="">`)
+	element_expecteds = append(element_expecteds, `<input type="text" id="int64_id" class="formr_int64" name="int64_name" value="0">`)
+	element_expecteds = append(element_expecteds, `<input type="text" id="float64_id" class="formr_float64" name="float64_name" value="0">`)
+	element_expecteds = append(element_expecteds, `<input type="checkbox" id="bool_id" class="formr_bool" name="bool_name">`)
+	element_expecteds = append(element_expecteds, `<input type="text" id="time_id" class="formr_time.Time" name="time_name" value="0001-01-01T00:00:00Z">`)
+	element_expecteds = append(element_expecteds, `<input type="text" id="date_id" class="formr_time.Time" name="date_name" value="0001-01-01T00:00:00Z">`)
+	element_expecteds = append(element_expecteds, `<input type="text" id="datetime_id" class="formr_time.Time" name="datetime_name" value="0001-01-01T00:00:00Z">`)
+	element_expecteds = append(element_expecteds, `<input type="text" class="formr_string" name="NoTagField" value="">`)
 
 	for i, form_element := range form_elements {
 		if i >= len(label_expecteds) {
@@ -101,20 +101,19 @@ func TestAllSupportedTypes(t *testing.T) {
 }
 
 type ComplexStruct struct {
-	ShortString string  `s2w_id:"uname" s2w_name:"user_name" s2w_label:"Name:"`
-	LongString  string  `s2w_id:"ustory" s2w_name:"story"`
-	BigInt      int64   `s2w_id:"age_id" s2w_name:"age_name" s2w_label:"Age:"`
-	Float       float64 `s2w_id:"ratio_id" s2w_name:"ratio_name" s2w_label:"Ratio:"`
-	TrueOrFalse bool    `s2w_id:"is_checked_id" s2w_name:"is_checked_name" s2w_label:"Checked:"`
+	ShortString string  `formr_id:"uname" formr:"user_name" formr_label:"Name:"`
+	LongString  string  `formr_id:"ustory" formr:"story"`
+	BigInt      int64   `formr_id:"age_id" formr:"age_name" formr_label:"Age:"`
+	Float       float64 `formr_id:"ratio_id" formr:"ratio_name" formr_label:"Ratio:"`
+	TrueOrFalse bool    `formr_id:"is_checked_id" formr:"is_checked_name" formr_label:"Checked:"`
 
-	IgnoreThisOne bool `s2w_name:"-"`
-	IgnoreThisToo bool `s2w_name:"-" s2w_id:"should_be_ignored" s2w_label:"What?:"`
+	IgnoreThisOne bool `formr:"-"`
+	IgnoreThisToo bool `formr:"-" formr_id:"should_be_ignored" formr_label:"What?:"`
 
-	DateTime    time.Time  `s2w_name:"time_name" s2w_label:"Date:"`
-	DateTimePtr *time.Time `s2w_id:"time_ptr_id" s2w_name:"time_ptr_name" s2w_label:"DatePtr:"`
+	DateTime    time.Time  `formr:"time_name" formr_label:"Date:"`
+	DateTimePtr *time.Time `formr_id:"time_ptr_id" formr:"time_ptr_name" formr_label:"DatePtr:"`
 }
 
-// s2w only counts struct fields that have the s2w_name tag
 func TestNumFormFields(t *testing.T) {
 	is_a_struct := ComplexStruct{}
 	form_strings, _ := ProcessStruct(is_a_struct)
@@ -155,9 +154,9 @@ func TestComplexStruct(t *testing.T) {
 }
 
 type CheckboxStruct struct {
-	StartTrue  bool `s2w_name:"StartTrue"`
-	StartFalse bool `s2w_name:"StartFalse"`
-	FilledOut  bool `s2w_id:"cool_id" s2w_name:"FilledOut" s2w_label:"Are we cool?" `
+	StartTrue  bool `formr:"StartTrue"`
+	StartFalse bool `formr:"StartFalse"`
+	FilledOut  bool `formr_id:"cool_id" formr:"FilledOut" formr_label:"Are we cool?" `
 }
 
 func TestCheckbox(t *testing.T) {
@@ -188,9 +187,9 @@ func TestCheckbox(t *testing.T) {
 	label_expecteds[1] = `<label></label>`
 	label_expecteds[2] = `<label for="cool_id">Are we cool?</label>`
 
-	element_expecteds[0] = `<input type="checkbox" class="s2w_bool" name="StartTrue" checked>`
-	element_expecteds[1] = `<input type="checkbox" class="s2w_bool" name="StartFalse">`
-	element_expecteds[2] = `<input type="checkbox" id="cool_id" class="s2w_bool" name="FilledOut" checked>`
+	element_expecteds[0] = `<input type="checkbox" class="formr_bool" name="StartTrue" checked>`
+	element_expecteds[1] = `<input type="checkbox" class="formr_bool" name="StartFalse">`
+	element_expecteds[2] = `<input type="checkbox" id="cool_id" class="formr_bool" name="FilledOut" checked>`
 
 	for i, form_element := range form_elements {
 		if i >= len(label_expecteds) {
@@ -246,8 +245,8 @@ func TestGorillaCompatibility(t *testing.T) {
 	label_expecteds = append(label_expecteds, `<label></label>`)
 	label_expecteds = append(label_expecteds, `<label></label>`)
 
-	element_expecteds = append(element_expecteds, `<input type="text" class="s2w_string" name="short_string" value="ShortString">`)
-	element_expecteds = append(element_expecteds, `<input type="text" class="s2w_string" name="OtherString" value="OtherString">`)
+	element_expecteds = append(element_expecteds, `<input type="text" class="formr_string" name="short_string" value="ShortString">`)
+	element_expecteds = append(element_expecteds, `<input type="text" class="formr_string" name="OtherString" value="OtherString">`)
 
 	for i, form_element := range form_elements {
 		if i >= len(label_expecteds) {

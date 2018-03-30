@@ -1,4 +1,4 @@
-package struct2webform
+package formr
 
 import (
 	"bytes"
@@ -114,24 +114,24 @@ func process_field(struct_field reflect.StructField, struct_field_value reflect.
 }
 
 const (
-	STRUCT_TAG_KEY_STRUCT_FIELD_TYPE = "s2w_type"
-	STRUCT_TAG_KEY_FIELD_ID          = "s2w_id"
-	STRUCT_TAG_KEY_FIELD_NAME        = "s2w_name"
-	STRUCT_TAG_KEY_LABEL_CONTENTS    = "s2w_label"
-	STRUCT_TAG_KEY_CURRENT_VALUE     = "s2w_value"
+	STRUCT_TAG_KEY_STRUCT_FIELD_TYPE = "formr_type"
+	STRUCT_TAG_KEY_FIELD_ID          = "formr_id"
+	STRUCT_TAG_KEY_FIELD_NAME        = "formr"
+	STRUCT_TAG_KEY_LABEL_CONTENTS    = "formr_label"
+	STRUCT_TAG_KEY_CURRENT_VALUE     = "formr_value"
 
 	STRUCT_TAG_KEY_GORILLA_SCHEMA_KEY_NAME = "schema"
 
 	EMPTY_VALUE_MARK = "-"
 
-	DEFAULT_LABEL_TEMPLATE = `<label{{ if .s2w_id }} for="{{ .s2w_id }}"{{ end }}>{{ .s2w_label }}</label>`
+	DEFAULT_LABEL_TEMPLATE = `<label{{ if .formr_id }} for="{{ .formr_id }}"{{ end }}>{{ .formr_label }}</label>`
 )
 
 func process_tag(struct_field reflect.StructField) (map[string]interface{}, bool) {
 	form_field_id := struct_field.Tag.Get(STRUCT_TAG_KEY_FIELD_ID)
 	label_contents := struct_field.Tag.Get(STRUCT_TAG_KEY_LABEL_CONTENTS)
 
-	// first check for s2w_name
+	// first check for formr
 	form_field_name := struct_field.Tag.Get(STRUCT_TAG_KEY_FIELD_NAME)
 	if form_field_name == "" {
 
@@ -171,7 +171,7 @@ func form_output_input_type_text(struct_field reflect.StructField, current_value
 
 	data[STRUCT_TAG_KEY_CURRENT_VALUE] = current_value
 
-	element_template := `<input type="text"{{ if .s2w_id }} id="{{ .s2w_id }}"{{ end }} class="s2w_{{ .s2w_type }}" name="{{ .s2w_name }}" value="{{ .s2w_value }}">`
+	element_template := `<input type="text"{{ if .formr_id }} id="{{ .formr_id }}"{{ end }} class="formr_{{ .formr_type }}" name="{{ .formr }}" value="{{ .formr_value }}">`
 
 	return execute_templates(1522519197, DEFAULT_LABEL_TEMPLATE, element_template, data)
 }
@@ -190,7 +190,7 @@ func form_output_bool(struct_field reflect.StructField, current_value bool) (*Fo
 
 	data[STRUCT_TAG_KEY_CURRENT_VALUE] = is_checked
 
-	element_template := `<input type="checkbox"{{ if .s2w_id }} id="{{ .s2w_id }}"{{ end }} class="s2w_{{ .s2w_type }}" name="{{ .s2w_name }}"{{if .s2w_value }} {{ .s2w_value }}{{end}}>`
+	element_template := `<input type="checkbox"{{ if .formr_id }} id="{{ .formr_id }}"{{ end }} class="formr_{{ .formr_type }}" name="{{ .formr }}"{{if .formr_value }} {{ .formr_value }}{{end}}>`
 
 	element, err := execute_templates(1963919951, DEFAULT_LABEL_TEMPLATE, element_template, data)
 	return element, err

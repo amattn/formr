@@ -1,8 +1,8 @@
-package struct2webform
+package formr
 
 const (
-	internal_BUILD_NUMBER   = 6
-	internal_VERSION_STRING = "0.0.3"
+	internal_BUILD_NUMBER   = 10
+	internal_VERSION_STRING = "0.1.0"
 )
 
 func BuildNumber() int64 {
